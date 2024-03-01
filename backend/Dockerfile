@@ -1,5 +1,7 @@
+
 FROM php:8.1-fpm
-WORKDIR .
+
+
 RUN apt-get update && apt-get install -y \
     curl \
     libicu-dev \
@@ -7,11 +9,23 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     && docker-php-ext-install -j$(nproc) intl pdo pdo_mysql zip
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-COPY . .
-RUN composer install --prefer-dist --no-progress --no-interaction
 
 EXPOSE 8081
-CMD php -S 0.0.0.0:8081 -t public/
+
+
+WORKDIR /var/www/html
+
+#Edited the installation command for composer due to an issue when trying to create an image 
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+
+COPY . .
+
+
+CMD ["php", "-S", "0.0.0.0:8081", "-t", "public/"]
+
+
 
 

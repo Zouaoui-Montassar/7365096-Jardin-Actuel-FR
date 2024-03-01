@@ -11,7 +11,9 @@ services:
       - symfony
 
   symfony:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - 8081:8081
     volumes:
@@ -20,9 +22,10 @@ services:
       - DATABASE_URL=mysql://root:jardin@mysql:3306/jardin_actuel?serverVersion=8&charset=utf8mb4
     depends_on:
       - mysql
+    command: bash -c "composer install && php -S 0.0.0.0:8081 -t public/"
     networks:
       - symfony
-
+# added the command to install the composer when running multiple containers
   mysql:
     image: mysql:latest
     restart: always
@@ -32,7 +35,6 @@ services:
       - MYSQL_ROOT_PASSWORD=jardin
       - MYSQL_USER=jardin
       - MYSQL_PASSWORD=jardin
-
     volumes:
       - ./data:/docker-entrypoint-initdb.d
       - ./mysql:/var/lib/mysql
@@ -41,9 +43,8 @@ services:
     ports:
       - 3307:3306
 
-      
 networks:
   symfony:
-  
+
 volumes:
   data:
